@@ -12,6 +12,7 @@ CARTRIDGE_INIT:
 ;; SET REV TO 1 FOR THE WORLD VERSION (NTSC AND JPN)
 
 GAME_REV:            EQU          0
+CHECKSUM:            DC.W         $96FH
 
 DC.B                 "SEGA MEGA DRIVE "                            ;; CONSOLE NAME
 DC.B                 "(C)SEGA 1990.JUL"                            ;; RELEASE DATE
@@ -23,3 +24,5 @@ DC.B "GM 00004028-01"                                              ;; GAME VERSI
 else 
 
 DC.B "GM 00004048-00"                                              ;; GAME VERSION - NON-DOM
+
+endif
