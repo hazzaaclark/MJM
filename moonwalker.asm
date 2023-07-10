@@ -26,3 +26,12 @@ else
 DC.B "GM 00004048-00"                                              ;; GAME VERSION - NON-DOM
 
 endif
+
+DC.B                 "J              "                             ;; IO SUPPORT
+DC.L                  CARTRIDGE_INIT
+DC.L                  CARTRIDGE_FREE
+
+DC.B                  $FFFF0000                                    ;; RAM START
+DC.B                  $FFFFFFFF                                    ;; RAM END
+
+END_OF_CARTRIDGE:
