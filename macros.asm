@@ -44,7 +44,13 @@ BUS_ERROR:          MACRO
                     NOP
                     BRA.B BUS_ERROR
                     @LOOP\@
-                    ENDM    
+                    ENDM
+
+
+
+DMA_VDP:            MACRO SOURCE, DEST, LEN, TYPE
+                    LEA VDP_CONTROL.L, A5   ;; LOAD THE EFFECTIVE ADDRESS OF THE VDP CONTROL IN GPR A5
+                    ENDM
 
 ;----------------------------------------------------------
 ;                       END OF FILE
