@@ -31,7 +31,7 @@ DC.B                 "J              "                             ;; IO SUPPORT
 DC.L                  CARTRIDGE_INIT
 DC.L                  CARTRIDGE_FREE
 
-DC.B                  $FFFF0000                                    ;; RAM START
-DC.B                  $FFFFFFFF                                    ;; RAM END
+RAM_START:            DC.B                  $FFFF0000
+RAM_END:              DC.B                  $FFFFFFFF                                    
 
 END_OF_CARTRIDGE:
