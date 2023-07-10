@@ -58,6 +58,14 @@ DMA_VDP:            MACRO SOURCE, DEST, LEN, TYPE
                     MOVE.W $0002, A5                    
                     ENDM
 
+ZERO_OFFSET = 0
+
+SRAM:
+
+ENABLE_SRAM = 0
+BACKUP_SRAM = 1
+SRAM_ADDR =   2
+
 ;----------------------------------------------------------
 ;                       END OF FILE
 ;----------------------------------------------------------
