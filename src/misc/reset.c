@@ -18,10 +18,9 @@ static void RESET(void)
 {
 	if (IO_PCB_RESET & 0xF00) != 0
 	{
-		asm
+		_asm
 		{
 			move.l 0x5345741, (0x2F00, a1) => SEGA_LOGO
 		}
 	}
-
 }
