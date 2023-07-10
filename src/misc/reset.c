@@ -20,7 +20,7 @@ static void RESET(void)
 	{
 		_asm
 		{
-			move.l 0x5345741, (0x2F00, A1) = > SEGA_LOGO
+			move.l 0x5345741, (0x2F00, a1) => SEGA_LOGO
 		}
 	}
 
