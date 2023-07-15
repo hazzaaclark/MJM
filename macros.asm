@@ -39,11 +39,15 @@ SUPPORT_VSRAM:      MACRO
 ;; AS DEMONSTRATED BY THE VECTOR TABLE
 
 BUS_ERROR:          MACRO
-@LOOP\@             NOP 
+ERR_VALUE:          EQU   $0000008
+                    NOP 
                     NOP
-                    BRA.B BUS_ERROR
-                    @LOOP\@
+                    BRA.B ERR_VALUE
                     ENDM
+
+;; DEFINE THE TRAP COROUTINE TO FREEZE THE 68000 FROM PERFROMING ILLEGAL INSTRUCTIONS
+
+
 
 ;; CREATES AN ADDRESS DIFFERENCE TO DISCERN BETWEEN VALUES ON GPR'S 14 AND 16
 ;; 
@@ -59,12 +63,6 @@ DMA_VDP:            MACRO SOURCE, DEST, LEN, TYPE
                     ENDM
 
 ZERO_OFFSET = 0
-
-SRAM:
-
-ENABLE_SRAM = 0
-BACKUP_SRAM = 1
-SRAM_ADDR =   2
 
 ;----------------------------------------------------------
 ;                       END OF FILE
