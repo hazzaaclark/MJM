@@ -6,6 +6,12 @@
 include "macros.asm"
 include "header.asm"
 
+SRAM:
+
+ENABLE_SRAM         EQU          0
+BACKUP_SRAM         EQU          1
+SRAM_ADDR           EQU          2
+
 CARTRIDGE_INIT:
 
 ;; SET REV TO 0 FOR ORIGINAL VERSION
@@ -27,11 +33,21 @@ DC.B "GM 00004048-00"                                              ;; GAME VERSI
 
 endif
 
-DC.B                 "J              "                             ;; IO SUPPORT
-DC.L                  CARTRIDGE_INIT
-DC.L                  CARTRIDGE_FREE
+SETUP_IO:
 
-RAM_START:            DC.B                  $FFFF0000
-RAM_END:              DC.B                  $FFFFFFFF                                    
+DC.B                 "J              "
+DC.L                  CARTRIDGE_INIT
+DC.L                  END_OF_CARTRIDGE
+
+DC.B          RAM_START             $FFFF0000
+DC.B          RAM_END               $FFFFFFFF                  
+
+SETUP_IO:
+
+DC.W                  VDP_INIT              $8000
+DC.W                  VDP_RAM               $3FFF
+DC.L                  VDP_DATA
+DC.L                  VDP_CTRL 
+DC.L                  VRAM_ADDR             $0x40000080
 
 END_OF_CARTRIDGE:
