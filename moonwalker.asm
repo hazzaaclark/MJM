@@ -39,15 +39,20 @@ DC.B                 "J              "
 DC.L                  CARTRIDGE_INIT
 DC.L                  END_OF_CARTRIDGE
 
-DC.B          RAM_START             $FFFF0000
-DC.B          RAM_END               $FFFFFFFF                  
-
-SETUP_IO:
+DC.B                  RAM_START             $FFFF0000
+DC.B                  RAM_END               $FFFFFFFF                  
 
 DC.W                  VDP_INIT              $8000
 DC.W                  VDP_RAM               $3FFF
 DC.L                  VDP_DATA
 DC.L                  VDP_CTRL 
 DC.L                  VRAM_ADDR             $0x40000080
+
+Z80_LOOKUP:
+
+TST.L                 (Z80_CTRL).L           ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (A, B)
+BNE.S                 Z80_INIT               ;; Z80 INITILISATION FUNCTION USING CHECK ZERO OR NON-ZERO
+TST.W                 (Z80_EXT_CTRL).L       ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (C)
+
 
 END_OF_CARTRIDGE:
