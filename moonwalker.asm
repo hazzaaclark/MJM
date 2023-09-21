@@ -50,16 +50,25 @@ DC.L                  VRAM_ADDR             $0x40000080
 
 Z80_LOOKUP:
 
-TST.L                 (Z80_CTRL).L           ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (A, B)
-BNE.S                 Z80_INIT               ;; Z80 INITILISATION FUNCTION USING CHECK ZERO OR NON-ZERO
-TST.W                 (Z80_EXT_CTRL).L       ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (C)
+TST.L                 (Z80_CTRL).L                  ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (A, B)
+BNE.W                 Z80_INIT                      ;; Z80 INITILISATION FUNCTION USING CHECK ZERO OR NON-ZERO
+TST.W                 (Z80_EXT_CTRL).L              ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (C)
 
-Z80_INIT:
+Z80_INIT:                                           ;; THIS IS ALSO REFERRED TO AS THE RESET COROUTINE - CALLED WHEN THE Z80 IS RE-INITIALISED ON BOOT
 
-BNE.S                 VDP_PORT_SKIP         ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
-LEA                   VDP_SETUP(PC), A5     ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
-                                            ;; SEE ADDRESSING CAPABILITIES - FIGURE 2.4 https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf
+BNE.B                 VDP_PORT_SKIP                 ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
+LEA                   VDP_SETUP(0x88, PC), A5       ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
+                                                    ;; SEE ADDRESSING CAPABILITIES - FIGURE 2.4 https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf
 
-MOVEM.W               (A5)+,D5-D7           ;; PERFROM A MULTI-REG PUSH ARGUMENT FROM THE ARRAY STRUCT INTO D5 THROUGH TO D7 - MOVING THE ABOVE ARG INTO THE DATA REGS ON A WORD-WISE BASIS
+MOVEM.W               (A5)+,D5-D7                      ;; PERFROM A MULTI-REG PUSH ARGUMENT FROM THE ARRAY STRUCT INTO D5 THROUGH TO D7
+MOVE.W                (0x1100, A1)=>Z80_PCB_VER, D0    ;; ALLOCATE THE Z80 PCB INTO THE CORRESPONDING ADDRESS AND DATA REGSITERS 
+                                                       ;; ACCORDING TO THE MEMORY MAP, THE Z80 IS CALLED AT THE PROVIDED ADDRESS REGISTER, WITH A DEDICATED
+                                                       ;; SIZE ALLOCATED ONTO THE ROM https://wiki.megadrive.org/index.php?title=Main_68k_memory_map
+   
+
+Z80_PCB_VER:           MACRO
+
+DC.W                   ""
+                       ENDM
 
 END_OF_CARTRIDGE:
