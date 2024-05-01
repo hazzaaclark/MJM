@@ -56,26 +56,25 @@ ROM_SRAM:
 
 Z80_LOOKUP:
 
-TST.L                 (Z80_CTRL).L                  ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (A, B)
-BNE.W                 Z80_INIT                      ;; Z80 INITILISATION FUNCTION USING CHECK ZERO OR NON-ZERO
-TST.W                 (Z80_EXT_CTRL).L              ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (C)
+TST.L                   (Z80_CTRL).L                            ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (A, B)
+BNE.W                   Z80_INIT                                ;; Z80 INITILISATION FUNCTION USING CHECK ZERO OR NON-ZERO
+TST.W                   (Z80_EXT_CTRL).L                        ;; TEST THE LONG LENGTH OF THE Z80'S REGISTERS (C)
 
-Z80_INIT:                                           ;; THIS IS ALSO REFERRED TO AS THE RESET COROUTINE - CALLED WHEN THE Z80 IS RE-INITIALISED ON BOOT
+Z80_INIT:                                                       ;; THIS IS ALSO REFERRED TO AS THE RESET COROUTINE - CALLED WHEN THE Z80 IS RE-INITIALISED ON BOOT
 
-BNE.B                 VDP_PORT_SKIP                 ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
-LEA                   VDP_SETUP(0x88, PC), A5       ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
-                                                    ;; SEE ADDRESSING CAPABILITIES - FIGURE 2.4 https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf
+BNE.B                   VDP_PORT_SKIP                           ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
+LEA                     VDP_SETUP(0x88, PC), A5                 ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
+                                                                ;; SEE ADDRESSING CAPABILITIES - FIGURE 2.4 https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf
 
-MOVEM.W               (A5)+,D5-D7                      ;; PERFROM A MULTI-REG PUSH ARGUMENT FROM THE ARRAY STRUCT INTO D5 THROUGH TO D7
-MOVE.W                (0x1100, A1)=>Z80_PCB_VER, D0    ;; ALLOCATE THE Z80 PCB INTO THE CORRESPONDING ADDRESS AND DATA REGSITERS 
-                                                       ;; ACCORDING TO THE MEMORY MAP, THE Z80 IS CALLED AT THE PROVIDED ADDRESS REGISTER, WITH A DEDICATED
-                                                       ;; SIZE ALLOCATED ONTO THE ROM https://wiki.megadrive.org/index.php?title=Main_68k_memory_map
-   
+MOVEM.L                 (A5)+,D5-D7                             ;; PERFROM A MULTI-REG PUSH ARGUMENT FROM THE ARRAY STRUCT INTO D5 THROUGH TO D7
+MOVE.W                  (-0x1100, A1)=>Z80_PCB_VER, D0          ;; ALLOCATE THE Z80 PCB INTO THE CORRESPONDING ADDRESS AND DATA REGSITERS 
+                                                                ;; ACCORDING TO THE MEMORY MAP, THE Z80 IS CALLED AT THE PROVIDED ADDRESS REGISTER, WITH A DEDICATED
+                                                                ;; SIZE ALLOCATED ONTO THE ROM https://wiki.megadrive.org/index.php?title=Main_68k_memory_map
 
-Z80_PCB_VER:           MACRO
+ANDI.W                  #$0F00, D0                                  ;; DISCERN AN AND LOGICAL OPERATIONS BETWEEN THE SOURCE ADDRESS AND THE NEW DESTINATION OF THE VALUE 
+BEQ.B                   VDP_RESET                                   ;; COUROUTINE TO CHECK IF THE CART CORRESPONDS WITH THE DESTINATION OPERAND LOCATED IN THE CCR , OTHERWISE THE VDP WILL RESET 
+MOVE.L                  #$053454741, ($02F00, A1)=>IO_TMSS          ;; IF THE CCR IS FOUND, CHECK FOR TMSS
 
-DC.W                   ""
-                       ENDM
 
 END_OF_CARTRIDGE:
 
