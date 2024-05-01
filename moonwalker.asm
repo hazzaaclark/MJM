@@ -75,6 +75,12 @@ ANDI.W                  #$0F00, D0                                  ;; DISCERN A
 BEQ.B                   VDP_RESET                                   ;; COUROUTINE TO CHECK IF THE CART CORRESPONDS WITH THE DESTINATION OPERAND LOCATED IN THE CCR , OTHERWISE THE VDP WILL RESET 
 MOVE.L                  #$053454741, ($02F00, A1)=>IO_TMSS          ;; IF THE CCR IS FOUND, CHECK FOR TMSS
 
+IO_TMSS:
+
+MOVE.W                  (A4),D0                                     ;; CLEAR WRITE PENDING FLAGS IN VDP TO PREVENT OVERFLOWS
+MOVEQ                   #0, D0                                      ;; CLEAR DATA REG 0, WHICH FLUSHES THE OPERAND
+MOVEA.L                 D0, A6                                      ;; CLEAR ADDRESS REG 6, WHICH STORES THE USP
+MOVE.L                  A6, USP                                     ;; SET USER STACK POINTER TO NULL
 
 END_OF_CARTRIDGE:
 
