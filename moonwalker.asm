@@ -62,8 +62,8 @@ TST.W                   (Z80_EXT_CTRL).L                        ;; TEST THE LONG
 
 Z80_INIT:                                                       ;; THIS IS ALSO REFERRED TO AS THE RESET COROUTINE - CALLED WHEN THE Z80 IS RE-INITIALISED ON BOOT
 
-BNE.B                   VDP_PORT_SKIP                           ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
-LEA                     VDP_SETUP(0x88, PC), A5                 ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
+BNE.B                   Z80_LOOKUP                          ;; SKIPS THE COROUTINE CHECK TO INITIALISE CONTROL REGISTERS
+LEA                     VDP_SETUP($88, PC), A5                 ;; LOAD EFFECTIVE ADDRESS INTO THE VDP VALUE SETUP MACRO - LOADING FROM THE ARRAY STRUCTURE
                                                                 ;; SEE ADDRESSING CAPABILITIES - FIGURE 2.4 https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf
 
 MOVEM.L                 (A5)+,D5-D7                             ;; PERFROM A MULTI-REG PUSH ARGUMENT FROM THE ARRAY STRUCT INTO D5 THROUGH TO D7
@@ -73,7 +73,10 @@ MOVE.W                  (-0x1100, A1)=>Z80_PCB_VER, D0          ;; ALLOCATE THE 
 
 ANDI.W                  #$0F00, D0                                  ;; DISCERN AN AND LOGICAL OPERATIONS BETWEEN THE SOURCE ADDRESS AND THE NEW DESTINATION OF THE VALUE 
 BEQ.B                   VDP_RESET                                   ;; COUROUTINE TO CHECK IF THE CART CORRESPONDS WITH THE DESTINATION OPERAND LOCATED IN THE CCR , OTHERWISE THE VDP WILL RESET 
-MOVE.L                  #$053454741, ($02F00, A1)=>IO_TMSS          ;; IF THE CCR IS FOUND, CHECK FOR TMSS
+MOVE.L                  #$53454741, ($2F00, A1)=>IO_TMSS          ;; IF THE CCR IS FOUND, CHECK FOR TMSS
+
+;; SINCE THIS REVISION OF MOONWALKER DOESN'T SUPPORT NATIVE TMSS
+;; THIS SECTION WILL ENCOMPASS A COROUTINE SUCH THAT IT WON'T LOOK FOR ANYTHING  
 
 IO_TMSS:
 
@@ -82,6 +85,25 @@ MOVEQ                   #0, D0                                      ;; CLEAR DAT
 MOVEA.L                 D0, A6                                      ;; CLEAR ADDRESS REG 6, WHICH STORES THE USP
 MOVE.L                  A6, USP                                     ;; SET USER STACK POINTER TO NULL
 
+VDP_RESET:
+
+MOVE.W                  (A4)=>VDP_CTRL, D0                          ;; MOVE THE VDP CONTROL CACHE INTO D0
+MOVEQ                   #$00, D0                                    ;; SET D0'S CONTENTS AND PRECEEDING CORRESPONDENCE TO NULL
+MOVEA.L                 D0, A6
+MOVE                    A6, USP                                     ;; MOVE THIS INTO THE USP
+MOVEQ                   #$17, D1
+
+;; ASSUMING THAT THE VDP HAS BEEN RESET THROUGH SOFT OR HARD RESET
+;; WE CAN BEGIN TO SETUP IT'S CORRESPONDENCE
+
+VDP_SETUP:
+
+DC.W                    $8000                                       ;; VDP INITIAL ADDRESS
+DC.W                    $3FFF                                       ;; SIZE OF VDP DMA
+DC.W                    $100                                        ;; VDP REGISTER OFFSET
+
+DC.L                    $40000080                                   ;; VRAM ADDRESS
+ 
 END_OF_CARTRIDGE:
 
         END
