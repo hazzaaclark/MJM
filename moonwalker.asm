@@ -18,7 +18,6 @@ CARTRIDGE_INIT:
 ;; SET REV TO 1 FOR THE WORLD VERSION (NTSC AND JPN)
 
 GAME_REV:            EQU          0
-CHECKSUM:            DC.W         $96FH
 
 DC.B                 "SEGA MEGA DRIVE "                            ;; CONSOLE NAME
 DC.B                 "(C)SEGA 1990.JUL"                            ;; RELEASE DATE
@@ -35,18 +34,25 @@ endif
 
 SETUP_IO:
 
-DC.B                 "J              "
+DC.B                 "J              "                             ;; IO SUPPORT 
 DC.L                  CARTRIDGE_INIT
-DC.L                  END_OF_CARTRIDGE
+DC.L                  END_OF_CARTRIDGE-1
 
-DC.B                  RAM_START             $FFFF0000
-DC.B                  RAM_END               $FFFFFFFF                  
+DC.B                  RAM_START             $FF0000
+DC.B                  RAM_END               $FFFFFF
 
-DC.W                  VDP_INIT              $8000
-DC.W                  VDP_RAM               $3FFF
-DC.L                  VDP_DATA
-DC.L                  VDP_CTRL 
-DC.L                  VRAM_ADDR             $0x40000080
+CHECKSUM:
+
+if GAME_REV=0
+    DC.W        $96FH
+else
+    DC.W        $AFC7
+endif
+
+ROM_SRAM:
+        DC.B    "       "                           ;; SRAM CODE (SEEMS TO BE UNUSED)
+        DC.L    $20202020                           ;; SRAM START
+        DC.L    $20202020                           ;; SRAM END
 
 Z80_LOOKUP:
 
@@ -72,3 +78,5 @@ DC.W                   ""
                        ENDM
 
 END_OF_CARTRIDGE:
+
+        END
